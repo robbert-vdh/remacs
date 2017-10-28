@@ -1038,19 +1038,6 @@ If BYTEPOS is out of range, the value is nil.  */)
   return make_number (BYTE_TO_CHAR (pos_byte));
 }
 
-DEFUN ("following-char", Ffollowing_char, Sfollowing_char, 0, 0, 0,
-       doc: /* Return the character following point, as a number.
-At the end of the buffer or accessible region, return 0.  */)
-  (void)
-{
-  Lisp_Object temp;
-  if (PT >= ZV)
-    XSETFASTINT (temp, 0);
-  else
-    XSETFASTINT (temp, FETCH_CHAR (PT_BYTE));
-  return temp;
-}
-
 DEFUN ("char-before", Fchar_before, Schar_before, 0, 1, 0,
        doc: /* Return character in current buffer preceding position POS.
 POS is an integer or a marker and defaults to point.
@@ -5182,7 +5169,6 @@ functions if all the text being accessed has this property.  */);
   defsubr (&Sgap_size);
   defsubr (&Sbyte_to_position);
 
-  defsubr (&Sfollowing_char);
   defsubr (&Schar_before);
   defsubr (&Sinsert);
   defsubr (&Sinsert_before_markers);
