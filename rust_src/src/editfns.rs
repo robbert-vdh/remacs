@@ -7,6 +7,7 @@ use remacs_sys::{buf_charpos_to_bytepos, globals, set_point_both, EmacsInt, Fadd
                  Fcons, Fcopy_sequence, Finsert_char, Qinteger_or_marker_p, Qmark_inactive, Qnil};
 use threads::ThreadState;
 use buffers::get_buffer;
+use character::dec_pos;
 use marker::{marker_position, set_point_from_marker};
 use multibyte::raw_byte_codepoint;
 use libc::{c_uchar, ptrdiff_t};
@@ -203,6 +204,24 @@ pub fn insert_byte(mut byte: LispObject, count: LispObject, inherit: LispObject)
             inherit.to_raw(),
         ))
     }
+}
+
+/// Return the character preceding point, as a number. At the
+/// beginning of the buffer or accessible region, return 0.
+#[lisp_fn(c_name = "previous_char")]
+pub fn preceding_char() -> LispObject {
+    let buffer_ref = ThreadState::current_buffer();
+
+    if buffer_ref.pt <= buffer_ref.begv {
+        return LispObject::from_natnum(0);
+    }
+
+    let pos = if LispObject::from(buffer_ref.enable_multibyte_characters).is_not_nil() {
+        unsafe { dec_pos(&buffer_ref.pt_byte) }
+    } else {
+        buffer_ref.pt_byte - 1
+    };
+    LispObject::from_natnum(buffer_ref.fetch_char(pos) as EmacsInt)
 }
 
 /// Return character in current buffer at position POS.

@@ -1051,25 +1051,6 @@ At the end of the buffer or accessible region, return 0.  */)
   return temp;
 }
 
-DEFUN ("preceding-char", Fprevious_char, Sprevious_char, 0, 0, 0,
-       doc: /* Return the character preceding point, as a number.
-At the beginning of the buffer or accessible region, return 0.  */)
-  (void)
-{
-  Lisp_Object temp;
-  if (PT <= BEGV)
-    XSETFASTINT (temp, 0);
-  else if (!NILP (BVAR (current_buffer, enable_multibyte_characters)))
-    {
-      ptrdiff_t pos = PT_BYTE;
-      DEC_POS (pos);
-      XSETFASTINT (temp, FETCH_CHAR (pos));
-    }
-  else
-    XSETFASTINT (temp, FETCH_BYTE (PT_BYTE - 1));
-  return temp;
-}
-
 DEFUN ("char-before", Fchar_before, Schar_before, 0, 1, 0,
        doc: /* Return character in current buffer preceding position POS.
 POS is an integer or a marker and defaults to point.
@@ -5202,7 +5183,6 @@ functions if all the text being accessed has this property.  */);
   defsubr (&Sbyte_to_position);
 
   defsubr (&Sfollowing_char);
-  defsubr (&Sprevious_char);
   defsubr (&Schar_before);
   defsubr (&Sinsert);
   defsubr (&Sinsert_before_markers);
